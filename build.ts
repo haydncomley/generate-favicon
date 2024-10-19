@@ -27,7 +27,6 @@ export const htmlIndex = \`${fs.readFileSync('html/index.html')}\`;
 esbuild.buildSync({
     entryPoints: ['src/index.ts'],
     bundle: true,
-    platform: 'neutral',
+    platform: 'node',
     outdir: 'bin',
-    packages: 'external'
 });

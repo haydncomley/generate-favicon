@@ -4,7 +4,7 @@ import fs from "fs";
 import { startServer } from "./server";
 import yargs from "yargs";
 import uniqolor from "uniqolor";
-import open from "open";
+import { open } from "openurl";
 
 const argv = yargs(process.argv.slice(2)).parseSync();
 
@@ -34,7 +34,11 @@ if (!iconName) {
         url.set('auto', 'true');
         console.log(`[generate-favicon] Server started: http://localhost:${port}`);
         const autoUrl = `http://localhost:${port}?${url.toString()}`;
-        open(autoUrl, { background: true });
+        open(autoUrl, (err) => {
+            if (err) {
+                console.error(`[generate-favicon] Failed to open URL: ${err.message}`);
+            }
+        });
     }, (data) => {
         console.log(`[generate-favicon] Saving icon to ${savePath}`);
         fs.writeFileSync(path.resolve(process.cwd(), savePath), data, 'base64');
