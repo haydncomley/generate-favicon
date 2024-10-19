@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>favicon.ico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        body {
+            margin: 0;
+        }
+
+        html {
+            margin: 0;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            max-height: 10rem;
+            max-width: 10rem;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <img id="favicon">
+
+    <script>
+        const stylesheet = document.styleSheets[0];
+        const faviconElement = document.getElementById("favicon");
+
+        function getIconDetails() {
+            const url = new URLSearchParams(window.location.search);
+            return {
+                icon: url.get("icon"),
+                background: url.get("background") || "transparent",
+                foreground: url.get("foreground") || "black",
+                size: url.get("size") || 2048,
+                radius: url.get("radius") || 256
+            }
+        }
+
+        function generateFavicon({ icon, background, foreground, size, radius }) {
+            const SIZE = size;
+            const ICON_SIZE = size * 0.65;
+
+            const canvas = document.createElement("canvas");
+            canvas.width = SIZE;
+            canvas.height = SIZE;
+            const ctx = canvas.getContext("2d");
+
+            ctx.fillStyle = getIconDetails().background;
+            ctx.roundRect(0, 0, SIZE, SIZE, radius);
+            ctx.fill();
+
+            ctx.fillStyle = getIconDetails().foreground;
+            ctx.font = ICON_SIZE + "px Material Symbols Outlined";
+            ctx.textAlign = "center";
+            ctx.fillText(icon, SIZE / 2, ICON_SIZE + (SIZE - ICON_SIZE) / 2);
+
+            return canvas.toDataURL();
+        }
+
+        function ready() {
+            faviconElement.src = generateFavicon(getIconDetails());
+        }
+
+        document.fonts.load("16px Material Symbols Outlined")
+        document.fonts.ready.then(ready);
+        faviconElement.addEventListener("load", () => {
+            window.top.postMessage(faviconElement.src, "*");
+        });
+    </script>
+</body>
+</html>

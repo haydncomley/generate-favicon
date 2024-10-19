@@ -1,0 +1,30 @@
+{
+  "name": "generate-favicon",
+  "version": "0.0.3",
+  "description": "Generate favicons quickly using Google's Material Symbols & Icons.",
+  "main": "index.js",
+  "repository": "git@github.com:haydncomley/generate-favicon.git",
+  "author": "Haydn Comley <haydncomley@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "bin": "bin/index.js",
+  "devDependencies": {
+    "@types/node": "22.7.7",
+    "esbuild": "0.24.0",
+    "material-design-icons": "3.0.1",
+    "uniqolor": "1.1.1",
+    "yargs": "17.7.2"
+  },
+  "scripts": {
+    "dev": "npx tsx watch ./src/index.ts",
+    "build": "npx tsx build ./build.ts",
+    "preview": "yarn build && node bin/index.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "dependencies": {
+    "open": "10.1.0"
+  }
+}

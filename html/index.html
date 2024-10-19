@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Favicon</title>
+
+    <style>
+        iframe {
+            width: 5rem;
+            height: 5rem;
+            border: none;
+            filter: drop-shadow(0 .25rem .5rem rgba(0,0,0,0.15));
+        }
+    </style>
+</head>
+<body>
+    <span id="icon" class="material-symbols-outlined">
+        search
+    </span>
+    <select id="iconSelect">
+    </select>
+    <input type="color" id="foreground" value="#ffffff">
+    <input type="color" id="background" value="#000000">
+
+    <iframe id="preview" src="./make?icon=adb"></iframe>
+
+    <button id="save">Save</button>
+
+    <script>
+        const icons = ["REPLACE_WITH_ICONS"];
+        const iconSelect = document.getElementById("iconSelect");
+        const iconPreview = document.getElementById("preview");
+        const saveButton = document.getElementById("save");
+        const foreground = document.getElementById("foreground");
+        const background = document.getElementById("background");
+
+        const argIcon = new URLSearchParams(window.location.search).get("icon");
+        const argForeground = new URLSearchParams(window.location.search).get("foreground");
+        const argBackground = new URLSearchParams(window.location.search).get("background");
+        const argAutoSave = !!(new URLSearchParams(window.location.search).get("auto"));
+
+        function onChange() {
+            const icon = iconSelect.value;
+            const fg = foreground.value;
+            const bg = background.value;
+            const url = new URLSearchParams();
+            if (icon) url.set("icon", icon);
+            if (argIcon) url.set("icon", argIcon);
+            if (fg) url.set("foreground", fg);
+            if (argForeground) url.set("foreground", argForeground);
+            if (bg) url.set("background", bg);
+            if (argBackground) url.set("background", argBackground);
+
+            iconPreview.src = "./make?" + url.toString();
+        }
+
+        function getIconData64(data) {
+            return iconPreview.contentDocument.body.querySelector("img").src;
+        }
+
+        function saveIcon(data) {
+            return new Promise((resolve, reject) => {
+                console.log("Send Data", data);
+                fetch("./save", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        data: data || getIconData64()
+                    })
+                }).then(() => {
+                    resolve();
+                });
+            });
+        }
+
+        icons.forEach(icon => {
+            const option = document.createElement("option");
+            option.value = icon;
+            option.text = icon;
+            iconSelect.appendChild(option);
+        });
+
+        iconSelect.value = argIcon ?? icons[0];
+        foreground.value = argForeground ?? "#ffffff";
+        background.value = argBackground ?? "#000000";
+        
+        if (argAutoSave) {
+            window.addEventListener("message", (event) => {
+                if (typeof event.data === "string") {
+                    saveIcon(event.data).then(() => {
+                        window.close();
+                    });
+                }
+            });
+        }
+
+        iconSelect.addEventListener("change", onChange);
+        foreground.addEventListener("change", onChange);
+        background.addEventListener("change", onChange);        
+        saveButton.addEventListener("click", saveIcon);
+        onChange();
+    </script>
+</body>
+</html>
